@@ -1,14 +1,61 @@
+mod events;
+mod xf;
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use std::sync::Once;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    static INIT: Once = Once::new();
+
+    pub fn setup_logger() -> Result<(), fern::InitError> {
+        use fern::colors::{Color, ColoredLevelConfig};
+        let level = if cfg!(debug_assertions) {
+            log::LevelFilter::Debug
+        } else {
+            log::LevelFilter::Warn
+        };
+        let colors = ColoredLevelConfig::new()
+            .trace(Color::Cyan)
+            .debug(Color::Magenta)
+            .info(Color::Green)
+            .warn(Color::BrightYellow)
+            .error(Color::Red);
+
+        fern::Dispatch::new()
+            .level(level)
+            .chain(
+                fern::Dispatch::new()
+                    .format(move |out, message, record| {
+                        let module_path: Vec<&str> =
+                            record.module_path().unwrap_or("").split("::").collect();
+                        let len = module_path.len();
+                        let module_path = if len > 2 && module_path[0] == "factory_management_utils"
+                        {
+                            format!("..{}::{}", module_path[len - 2], module_path[len - 1])
+                        } else {
+                            record.module_path().unwrap_or("").to_string()
+                        };
+                        out.finish(format_args!(
+                            "[{}][{}] {}",
+                            module_path,
+                            colors.color(record.level()),
+                            message
+                        ))
+                    })
+                    .chain(std::io::stdout()),
+            )
+            .apply()?;
+
+        Ok(())
+    }
+
+    pub fn setup() {
+        INIT.call_once(|| {
+            setup_logger().expect("Logger couldn't be initialized");
+        });
     }
 }
