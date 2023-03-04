@@ -31,10 +31,7 @@ pub fn add_field(args: TokenStream, input: TokenStream) -> TokenStream {
         );
     }
 
-    return quote! {
-        #item_struct
-    }
-    .into();
+    (quote! {#item_struct}).into()
 }
 
 #[cfg(test)]

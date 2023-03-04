@@ -29,14 +29,14 @@ pub trait EventDispatcher {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use crate::tests::setup;
     use log::debug;
 
     ///basic state machine
-    struct BasicSink {
-        event_count: usize,
+    pub struct BasicSink {
+        pub event_count: usize,
     }
 
     impl EventSink for BasicSink {
@@ -48,11 +48,11 @@ mod tests {
 
     ///Basic event
     #[derive(Copy, Clone)]
-    struct EmptyEventData {}
+    pub struct EmptyEventData {}
 
     ///Basic event dispatcher
-    struct BasicEventDispatcher {
-        sink: BasicSink,
+    pub struct BasicEventDispatcher {
+        pub(crate) sink: BasicSink,
     }
 
     impl EventData for EmptyEventData {}
