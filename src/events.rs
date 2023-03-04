@@ -5,7 +5,7 @@ pub trait EventSink {
 }
 
 ///Trait given to data of events
-pub trait EventData: Copy {}
+pub trait EventData {}
 
 ///Trait describing events dispatchers, that are contained in the queue
 pub trait EventDispatcher {
